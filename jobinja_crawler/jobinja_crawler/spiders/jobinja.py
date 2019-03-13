@@ -7,7 +7,7 @@ from scrapy import Request
 import codecs
 import logging
 
-class IsnaSpider(CrawlSpider):
+class JobInja(CrawlSpider):
     name = "jobinja"
     allowed_domains = ["www.jobinja.ir","jobinja.ir"]
     start_urls = [
