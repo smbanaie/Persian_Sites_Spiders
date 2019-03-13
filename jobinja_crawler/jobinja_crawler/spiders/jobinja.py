@@ -21,8 +21,8 @@ class IsnaSpider(CrawlSpider):
              ]
     # logger = logging.getLogger(__name__)
 
-    company_details  = r"D:\MyTempRepo\jobinja_crawler\companies.csv"
-    company_jobs_details = r"D:\MyTempRepo\jobinja_crawler\companies_jobs.csv"
+    company_details  = r"companies_info.csv"
+    company_jobs_details = r"companies_jobs.csv"
 
     def parse_company(self, response):
         yield Request(response.request.url +"/jobs",
@@ -63,8 +63,6 @@ class IsnaSpider(CrawlSpider):
         f.close()
         yield item
 
-    # response.css(".c-jobView__firstInfoBox").xpath(".//li[h4/text()='دسته‌بندی شغلی']//span/text()").get().strip()
-    # response.css(".c-jobView__firstInfoBox").xpath(".//h4/text()").get()
     def parse_jobs(self, response):
         item = JobinjaJobItem()
         item["company_fa"] = response.css('h2.c-companyHeader__name::text').get().strip()
