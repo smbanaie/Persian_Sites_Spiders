@@ -24,15 +24,6 @@ class IsnaSpider(CrawlSpider):
     company_details  = r"D:\MyTempRepo\jobinja_crawler\companies.csv"
     company_jobs_details = r"D:\MyTempRepo\jobinja_crawler\companies_jobs.csv"
 
-    # def parse_companies(self, response):
-    #     # f = codecs.open(self.companies_link, "a", encoding="utf-8")
-    #     # row_csv = "{0}\r\n".format(response.request.url)
-    #     # f.write(row_csv)
-    #     # f.close()
-
-
-
-
     def parse_company(self, response):
         yield Request(response.request.url +"/jobs",
                       meta = {
@@ -64,7 +55,7 @@ class IsnaSpider(CrawlSpider):
             item["company_size"] = company_metadata[1].strip()
             item["year"] = str(None)
             item["company_site"] = str(None)
-        f = codecs.open(self.company_details, "a", encoding="utf-8")
+        f = codecs.open(self.company_details, "w", encoding="utf-8")
         row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format(item["title_fa"], item["title_en"], item["open_jobs"],
                                                            item["category"], item["company_size"], item["company_site"],
                                                            item["year"])
@@ -169,7 +160,7 @@ class IsnaSpider(CrawlSpider):
                 [" ".join([word.strip() for word in ms.split() if word != ""])
                  for ms in militaryServiceStatus if ms != ""])
 
-        f = codecs.open(self.company_jobs_details, "a", encoding="utf-8")
+        f = codecs.open(self.company_jobs_details, "w", encoding="utf-8")
         row_csv = "Company :{0},title:{1},categories: {2},location: {3}, jobType: {4},minExperience:{5},salary: {6}," \
                   "skills:{7}, gender: {8}, allowedMajors:{9},active: {10},period: {11}, degree: {12}," \
                   "language: {13},desc: {14}, company_desc: {15},link:{16}\r\n"\
