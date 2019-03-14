@@ -172,12 +172,16 @@ class JobinjaSpider(CrawlSpider):
     def write_company_info(self, item, header=False):
 
         if not header:
-            f = codecs.open(self.company_details, "a", encoding="utf-8")
-            row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format(item["title_fa"], item["title_en"], item["open_jobs"],
-                                                           item["category"], item["company_size"], item["company_site"],
-                                                           item["year"])
+            f = codecs.open(self.company_details, "a", encoding="utf8")
+            row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format(item["title_fa"].replace(",", "،"),
+                                                               item["title_en"].replace(",", "،"),
+                                                               item["open_jobs"].replace(",", "،"),
+                                                               item["category"].replace(",", "،"),
+                                                               item["company_size"].replace(",", "،"),
+                                                               item["company_site"].replace(",", "،"),
+                                                               item["year"].replace(",", "،"))
         else:
-            f = codecs.open(self.company_details, "w", encoding="utf-8")
+            f = codecs.open(self.company_details, "w", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format("title_fa", "title_en", "open_jobs",
                                                                "category", "company_size", "company_site",
                                                                "year")
@@ -186,16 +190,19 @@ class JobinjaSpider(CrawlSpider):
 
     def write_job_info(self, item, header=False):
         if not header:
-            f = codecs.open(self.company_jobs_details, "a", encoding="utf-8")
+            f = codecs.open(self.company_jobs_details, "a", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}," \
                       "{13},{14},{15}\r\n" \
-                .format(item["company_fa"], item["name"], item["category"],
-                        item["location"], item["jobType"], item["minExperience"],
-                        item["salary"], item["skills"], item["gender"], item["allowedMajors"],
-                        item["active"], item["period"], item["degree"], item["language"],
-                        item["desc"], item["company_desc"])
+                .format(item["company_fa"].replace(",", "،"), item["name"].replace(",", "،"),
+                        item["category"].replace(",", "،"), item["location"].replace(",", "،"),
+                        item["jobType"].replace(",", "،"), item["minExperience"].replace(",", "،"),
+                        item["salary"].replace(",", "،"), item["skills"].replace(",", "،"),
+                        item["gender"].replace(",", "،"), item["allowedMajors"].replace(",", "،"),
+                        item["active"], item["period"].replace(",", "،"),
+                        item["degree"].replace(",", "،"), item["language"].replace(",", "،"),
+                        item["desc"].replace(",", "،"), item["company_desc"].replace(",", "،"))
         else:
-            f = codecs.open(self.company_jobs_details, "w", encoding="utf-8")
+            f = codecs.open(self.company_jobs_details, "w", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}," \
                       "{13},{14},{15}\r\n" \
                 .format("company_fa", "name", "category",
