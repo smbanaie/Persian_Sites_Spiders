@@ -4,7 +4,8 @@ from jobinja_crawler.items import JobinjaCompanyItem, JobinjaJobItem
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy import Request
-import codecs
+import codecs,os
+from datetime import datetime
 import logging
 
 
@@ -18,8 +19,9 @@ class JobinjaSpider(CrawlSpider):
     #
     def __init__(self):
         super().__init__()
-        self.write_company_info({}, header=True)
-        self.write_job_info({}, header=True)
+        if not os.path.exists(self.company_details+datetime.now().strftime("-%Y-%m")+'.csv'):
+            self.write_company_info({}, header=True)
+            self.write_job_info({}, header=True)
 
     rules = [Rule(LinkExtractor(allow=r'/companies/[^/]+$', ), callback='parse_company', follow=False),
              Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs$', ), callback='parse_company_jobs',
@@ -29,8 +31,8 @@ class JobinjaSpider(CrawlSpider):
              ]
     # logger = logging.getLogger(__name__)
 
-    company_details = r"companies_info.csv"
-    company_jobs_details = r"companies_jobs.csv"
+    company_details = r"companies_info"
+    company_jobs_details = r"companies_jobs"
 
     def parse_company(self, response):
         yield Request(response.request.url + "/jobs",
@@ -170,9 +172,8 @@ class JobinjaSpider(CrawlSpider):
         yield item
 
     def write_company_info(self, item, header=False):
-
+        f = codecs.open(self.company_details+datetime.now().strftime("-%Y-%m")+'.csv', "a", encoding="utf8")
         if not header:
-            f = codecs.open(self.company_details, "a", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format(item["title_fa"].replace(",", "،"),
                                                                item["title_en"].replace(",", "،"),
                                                                item["open_jobs"].replace(",", "،"),
@@ -181,7 +182,6 @@ class JobinjaSpider(CrawlSpider):
                                                                item["company_site"].replace(",", "،"),
                                                                item["year"].replace(",", "،"))
         else:
-            f = codecs.open(self.company_details, "w", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6}\r\n".format("title_fa", "title_en", "open_jobs",
                                                                "category", "company_size", "company_site",
                                                                "year")
@@ -189,8 +189,8 @@ class JobinjaSpider(CrawlSpider):
         f.close()
 
     def write_job_info(self, item, header=False):
+        f = codecs.open(self.company_jobs_details+datetime.now().strftime("-%Y-%m")+'.csv', "a", encoding="utf8")
         if not header:
-            f = codecs.open(self.company_jobs_details, "a", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}," \
                       "{13},{14},{15}\r\n" \
                 .format(item["company_fa"].replace(",", "،"), item["name"].replace(",", "،"),
@@ -202,7 +202,6 @@ class JobinjaSpider(CrawlSpider):
                         item["degree"].replace(",", "،"), item["language"].replace(",", "،"),
                         item["desc"].replace(",", "،"), item["company_desc"].replace(",", "،"))
         else:
-            f = codecs.open(self.company_jobs_details, "w", encoding="utf8")
             row_csv = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}," \
                       "{13},{14},{15}\r\n" \
                 .format("company_fa", "name", "category",
