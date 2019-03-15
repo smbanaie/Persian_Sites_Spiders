@@ -23,8 +23,8 @@ class JobinjaSpider(CrawlSpider):
             self.write_company_info({}, header=True)
             self.write_job_info({}, header=True)
 
-    rules = [Rule(LinkExtractor(allow=r'/companies/[^/]+$', ), callback='parse_company', follow=False),
-             Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs$', ), callback='parse_company_jobs',
+    rules = [Rule(LinkExtractor(allow=r'/companies/[^/]+$', ), callback='yield_company_jobs', follow=False),
+             Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs$', ), callback='parse_company_info',
                   follow=True),
              Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs/\.*', ), callback='parse_jobs', follow=False),
              Rule(LinkExtractor(allow=[r'\/companies\?page=\d+', r'\/companies$'], ), follow=True)
@@ -34,36 +34,43 @@ class JobinjaSpider(CrawlSpider):
     company_details = r"companies_info"
     company_jobs_details = r"companies_jobs"
 
-    def parse_company(self, response):
+    def yield_company_jobs(self, response):
         yield Request(response.request.url + "/jobs",
                       meta={
                           'dont_redirect': True,
                           'handle_httpstatus_list': [302]
-                      }, callback=self.parse_company_jobs)
+                      }, callback=self.parse_company_info)
 
-    def parse_company_jobs(self, response):
+    def parse_company_info(self, response):
         item = JobinjaCompanyItem()
-        tiltle = response.xpath('//h2[@class="c-companyHeader__name"]/text()').extract()
+        tiltle = response.xpath('//h2[@class="c-companyHeader__name"]/text()').getall()
         item["title_fa"] = tiltle[0]
         item["title_en"] = tiltle[1]
-        item["open_jobs"] = response.css('.c-companyHeader__navigatorOpenJobs::text').extract_first()
+        item["open_jobs"] = response.css('.c-companyHeader__navigatorOpenJobs::text').get()
         company_metadata = [x.strip() for x in
-                            response.xpath('//div[@class="c-companyHeader__meta"]/span//text()').extract() if
+                            response.xpath('//div[@class="c-companyHeader__meta"]/span//text()').getall() if
                             x.strip() != ""]
 
         if len(company_metadata) == 4:
-            item["year"] = company_metadata[0].strip()
-            item["category"] = company_metadata[1].strip()
-            item["company_size"] = company_metadata[2].strip()
-            item["company_site"] = company_metadata[3].strip()
+            item["year"] = company_metadata[0]
+            item["category"] = company_metadata[1]
+            item["company_size"] = company_metadata[2]
+            item["company_site"] = company_metadata[3]
         elif len(company_metadata) == 3:
-            item["category"] = company_metadata[0].strip()
-            item["company_size"] = company_metadata[1].strip()
-            item["company_site"] = company_metadata[2].strip()
-            item["year"] = str(None)
+            if 'تاسیس' in  company_metadata[0]:
+                item["category"] = company_metadata[1]
+                item["company_size"] = company_metadata[2]
+                item["company_site"] = str(None)
+                item["year"] = company_metadata[0]
+            else:
+                item["category"] = company_metadata[0]
+                item["company_size"] = company_metadata[1]
+                item["company_site"] = company_metadata[2]
+                item["year"] = str(None)
+
         else:
-            item["category"] = company_metadata[0].strip()
-            item["company_size"] = company_metadata[1].strip()
+            item["category"] = company_metadata[0]
+            item["company_size"] = company_metadata[1]
             item["year"] = str(None)
             item["company_site"] = str(None)
         self.write_company_info(item)
