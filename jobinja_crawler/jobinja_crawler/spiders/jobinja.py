@@ -16,7 +16,6 @@ class JobinjaSpider(CrawlSpider):
         "https://jobinja.ir/companies"
     ]
 
-    #
     def __init__(self):
         super().__init__()
         if not os.path.exists(self.company_details+datetime.now().strftime("-%Y-%m")+'.csv'):
