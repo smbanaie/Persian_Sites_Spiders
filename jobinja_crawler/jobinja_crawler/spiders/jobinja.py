@@ -23,7 +23,7 @@ class JobinjaSpider(CrawlSpider):
             self.write_job_info({}, header=True)
 
     rules = [Rule(LinkExtractor(allow=r'/companies/[^/]+$', ), callback='yield_company_jobs', follow=False),
-             Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs$', ), callback='parse_company_info',
+                 Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs$', ), callback='parse_company_info',
                   follow=True),
              Rule(LinkExtractor(allow=r'/companies/[a-zA-Z0-9\-_]+/jobs/\.*', ), callback='parse_jobs', follow=False),
              Rule(LinkExtractor(allow=[r'\/companies\?page=\d+', r'\/companies$'], ), follow=True)
